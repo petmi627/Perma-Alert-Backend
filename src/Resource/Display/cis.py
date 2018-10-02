@@ -1,4 +1,4 @@
-from flask_restful import Resource
+from flask_restful import Resource, abort
 
 cis = {
     "diekirch": {
@@ -13,6 +13,11 @@ cis = {
 
 class CIS(Resource):
 
-    def get(self, cis_name):
+    def abort_if_cis_doesnt_exist(self, location):
+        if location not in cis:
+            abort(404, message="CIS {} doesn't exist".format(location))
+
+    def get(self, location):
         """ Return a List with cis """
-        return cis[cis_name], 200
+        self.abort_if_cis_doesnt_exist(location)
+        return cis[location], 200
