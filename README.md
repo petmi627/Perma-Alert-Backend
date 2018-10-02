@@ -3,3 +3,8 @@
 ## Introduction
 
 This Application provides a Rest API for the Perma Alert Display Application
+
+
+## Installation
+
+Create a virtual environment
