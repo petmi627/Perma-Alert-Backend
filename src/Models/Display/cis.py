@@ -1,6 +1,6 @@
 from src.common.db import db
 
-class cis(db.Model):
+class CisModel(db.Model):
 
     __tablename__ = 'cis'
 
@@ -18,5 +18,7 @@ class cis(db.Model):
         """ Return a directory from Model """
         return {'name': self.name, 'location': self.location, 'vehicle': self.vehicle}
 
-    def get_cis_by_location(self):
+    @classmethod
+    def get_cis_by_location(cls, location):
         """ Get CIS from database """
+        return cls.query.filter_by(location=location).first()

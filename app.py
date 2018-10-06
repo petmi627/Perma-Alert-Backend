@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # Initialize DB
     from src.common.db import db
-    db.init_app(app)
+    db.init_app(app=app)
 
     app.run(debug=True)
 
