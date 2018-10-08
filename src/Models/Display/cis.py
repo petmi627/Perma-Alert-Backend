@@ -16,7 +16,7 @@ class CisModel(db.Model):
 
     def json(self):
         """ Return a directory from Model """
-        return {'name': self.name, 'location': self.location, 'vehicle': self.vehicle}
+        return {'name': self.name, 'location': self.location, 'vehicle': None}
 
     @classmethod
     def get_cis_by_location(cls, location):
