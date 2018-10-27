@@ -1,4 +1,5 @@
 from src.common.db import db
+from datetime import datetime
 
 class DutyModel(db.Model):
 
@@ -29,4 +30,6 @@ class DutyModel(db.Model):
     @classmethod
     def get_duty_by_location_engine(cls, location, engine):
         """ Get CIS from database """
-        return cls.query.filter_by(engine=engine, location=location).limit(4)
+        now = datetime.now()
+
+        return cls.query.filter(cls.engine == engine, cls.location == location).filter(cls.start >= now).limit(4)
