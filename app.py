@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_restful import Api
+from flask_cors import CORS
 from src.Resource.Display import cis, duty, headlines, intervention
 
 app = Flask(__name__)
@@ -13,6 +14,7 @@ from src.common.db import db
 db.init_app(app=app)
 
 api = Api(app)
+CORS(app)
 
 api.add_resource(cis.CIS, '/display/cis/<string:location>')
 api.add_resource(duty.Duty, '/display/cis/<string:location>/duties/<string:engine>')
