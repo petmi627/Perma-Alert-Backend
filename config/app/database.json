@@ -1,0 +1,4 @@
+{
+  "localhost": "mysql://root@localhost/permaalert?charset=utf8",
+  "track_modification": false
+}

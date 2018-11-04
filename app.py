@@ -2,11 +2,14 @@ from flask import Flask
 from flask_restful import Api
 from flask_cors import CORS
 from src.Resource.Display import cis, duty, headlines, intervention
+from src.common.config import Config
+
+config = Config()
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/permaalert?charset=utf8'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = config.config['database']['localhost']
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.config['database']['track_modification']
 
 
 # Initialize DB
@@ -23,6 +26,5 @@ api.add_resource(headlines.Headlines, '/display/headlines')
 
 
 if __name__ == '__main__':
-
     app.run(debug=True)
 
