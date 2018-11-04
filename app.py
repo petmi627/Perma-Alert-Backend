@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restful import Api
 from flask_cors import CORS
-from src.Resource.Display import cis, duty, headlines, intervention
+from src.Resource.Display import cis, duty, headlines, intervention, weather
 from src.common.config import Config
 
 config = Config()
@@ -23,8 +23,10 @@ api.add_resource(cis.CIS, '/display/cis/<string:location>')
 api.add_resource(duty.Duty, '/display/cis/<string:location>/duties/<string:engine>')
 api.add_resource(intervention.Intervention, '/display/cis/<string:location>/intervention')
 api.add_resource(headlines.Headlines, '/display/headlines')
+api.add_resource(weather.Weather, '/display/cis/<string:location>/weather')
 
 
 if __name__ == '__main__':
+
     app.run(debug=True)
 
