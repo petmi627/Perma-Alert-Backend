@@ -1,5 +1,6 @@
 from flask_restful import Resource, abort
 import requests
+from datetime import datetime, timedelta
 from src.Models.Display.cis import CisModel
 from src.common.config import Config
 
@@ -7,61 +8,24 @@ from src.common.config import Config
 class Weather(Resource):
 
     def transform_weather(self, weather):
-        weather = str(weather).replace('light intensity drizzle', 'wi-fog')
-        weather = str(weather).replace('drizzle', 'wi-fog')
-        weather = str(weather).replace('heavy intensity drizzle', 'wi-fog')
-        weather = str(weather).replace('light intensity drizzle rain', 'wi-fog')
-        weather = str(weather).replace('drizzle rain', 'wi-fog')
-        weather = str(weather).replace('heavy intensity drizzle rain ', 'wi-fog')
-        weather = str(weather).replace('shower rain and drizzle', 'wi-fog')
-        weather = str(weather).replace('heavy shower rain and drizzle', 'wi-fog')
-        weather = str(weather).replace('shower drizzle ', 'wi-fog')
-        weather = str(weather).replace('mist', 'wi-fog')
-        weather = str(weather).replace('smoke', 'wi-smoke')
-        weather = str(weather).replace('haze', 'wi-day-haze')
-        weather = str(weather).replace('sand, dust whirls', 'wi-sandstorm')
-        weather = str(weather).replace('sand', 'wi-sandstorm')
-        weather = str(weather).replace('fog', 'wi-fog')
-        weather = str(weather).replace('dust', 'wi-dust')
-        weather = str(weather).replace('volcanic ash', 'wi-volcano')
-        weather = str(weather).replace('squalls', 'wi-storm-showers')
-        weather = str(weather).replace('tornado', 'wi-tornado')
-        weather = str(weather).replace('clear sky', 'wi-day-sunny')
-        weather = str(weather).replace('few clouds', 'wi-day-cloudy')
-        weather = str(weather).replace('scattered clouds', 'wi-cloud')
-        weather = str(weather).replace('broken clouds', 'wi-cloudy')
-        weather = str(weather).replace('overcast clouds', 'wi-day-sunny-overcast')
-        weather = str(weather).replace('light snow', 'wi-snow')
-        weather = str(weather).replace('snow', 'wi-snow')
-        weather = str(weather).replace('heavy snow', 'wi-snow')
-        weather = str(weather).replace('sleet', 'wi-sleet')
-        weather = str(weather).replace('shower sleet', 'wi-sleet')
-        weather = str(weather).replace('light rain and snow', 'wi-rain-mix')
-        weather = str(weather).replace('rain and snow', 'wi-rain-mix')
-        weather = str(weather).replace('light shower snow', 'wi-rain-mix')
-        weather = str(weather).replace('shower snow', 'wi-rain-mix')
-        weather = str(weather).replace('heavy shower snow', 'wi-rain-mix')
-        weather = str(weather).replace('light rain', 'wi-rain')
-        weather = str(weather).replace('moderate rain', 'wi-rain')
-        weather = str(weather).replace('heavy intensity rain', 'wi-rain')
-        weather = str(weather).replace('very heavy rain', 'wi-rain')
-        weather = str(weather).replace('extreme rain', 'wi-rain')
-        weather = str(weather).replace('freezing rain', 'wi-rain')
-        weather = str(weather).replace('light intensity shower rain', 'wi-rain')
-        weather = str(weather).replace('shower rain', 'wi-rain')
-        weather = str(weather).replace('heavy intensity shower rain', 'wi-rain')
-        weather = str(weather).replace('ragged shower rain', 'wi-rain')
-        weather = str(weather).replace('thunderstorm with light rain', 'wi-thunderstorm')
-        weather = str(weather).replace('thunderstorm with heavy rain', 'wi-thunderstorm')
-        weather = str(weather).replace('light thunderstorm', 'wi-thunderstorm')
-        weather = str(weather).replace('thunderstorm', 'wi-thunderstorm')
-        weather = str(weather).replace('heavy thunderstorm', 'wi-thunderstorm')
-        weather = str(weather).replace('thunderstorm with light drizzle', 'wi-thunderstorm')
-        weather = str(weather).replace('thunderstorm with drizzle', 'wi-thunderstorm')
-        weather = str(weather).replace('thunderstorm with heavy drizzle', 'wi-thunderstorm')
+        """ Return the Icon name from the Weather Icons Package"""
+        c = Config
 
-        return weather
+        icon = str(c.config['weather_icons'][weather['weather'][0]['description'].replace(' ', '_').replace(',', '')])
 
+        sunrise = datetime.fromtimestamp(weather['sys']['sunrise'])
+        sunset = datetime.fromtimestamp(weather['sys']['sunset'])
+        now = datetime.now()
+
+        icon_format = "night"
+        if sunrise < now and sunset > now:
+            icon_format = "day"
+
+        if icon_format == "night":
+            icon = icon.replace('sunny-overcast', 'partly-cloudy')
+            icon = icon.replace('sunny', 'clear')
+
+        return icon.format(icon_format)
 
     def get(self, location):
         """ Return a List with cis """
@@ -78,18 +42,68 @@ class Weather(Resource):
 
         weather = request.json()
 
-        print(weather)
-
         return {
             'temperature': float(weather['main']['temp']),
             'pressure': float(weather['main']['pressure']),
             'humidity': float(weather['main']['humidity']),
             'temp_min': float(weather['main']['temp_min']),
             'temp_max': float(weather['main']['temp_max']),
-            'weather': self.transform_weather(weather['weather'][0]['main']),
-            'weather_icon': self.transform_weather(weather['weather'][0]['description']),
+            'weather': weather['weather'][0]['main'],
+            'weather_icon': self.transform_weather(weather),
             'weather_description': str(weather['weather'][0]['description']),
             'wind_speed': weather['wind']['speed'],
             'location': str(weather['name']),
             'country': str(weather['sys']['country']),
         }, 200
+
+class Forecast(Resource):
+
+    def transform_weather(self, weather):
+        """ Return the Icon name from the Weather Icons Package"""
+        c = Config
+
+        icon = c.config['weather_icons'][weather['weather'][0]['description'].replace(' ', '_').replace(',', '')]
+        icon_format = "day"
+
+        return icon.format(icon_format)
+
+    def get(self, location):
+        """ Return the Weather Forecast of the given location """
+        cis = CisModel.get_cis_by_location(location=location)
+        if not cis:
+            abort(404, message="CIS {} doesn't exist".format(location))
+
+        c = Config()
+        request = requests.get('https://api.openweathermap.org/data/2.5/forecast?&units=metric&q=' +
+                               cis.location + ',LU&appid=' + c.config['secret_keys']['weather_api'])
+        if not request.status_code == 200:
+            abort(404, message="Cannot get weather data for city {}".format(location))
+
+        forecast = request.json()
+        now = datetime.now()
+
+        forecast_list = []
+        for item in forecast['list']:
+            dt = datetime.fromtimestamp(item['dt'])
+            if dt > now:
+
+                weather = {
+                    'temperature': float(item['main']['temp']),
+                    'pressure': float(item['main']['pressure']),
+                    'humidity': float(item['main']['humidity']),
+                    'temp_min': float(item['main']['temp_min']),
+                    'temp_max': float(item['main']['temp_max']),
+                    'weather': item['weather'][0]['main'],
+                    'weather_icon': self.transform_weather(item),
+                    'weather_description': str(item['weather'][0]['description']),
+                    'wind_speed': item['wind']['speed'],
+                    'location': str(forecast['city']['name']),
+                    'country': str(forecast['city']['country']),
+                    'datetime': dt.isoformat()
+                }
+
+                forecast_list.append(weather)
+                now += timedelta(days=1)
+
+
+        return forecast_list, 200

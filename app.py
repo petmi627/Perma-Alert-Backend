@@ -24,6 +24,7 @@ api.add_resource(duty.Duty, '/display/cis/<string:location>/duties/<string:engin
 api.add_resource(intervention.Intervention, '/display/cis/<string:location>/intervention')
 api.add_resource(headlines.Headlines, '/display/headlines')
 api.add_resource(weather.Weather, '/display/cis/<string:location>/weather')
+api.add_resource(weather.Forecast, '/display/cis/<string:location>/weather/forecast')
 
 
 if __name__ == '__main__':
