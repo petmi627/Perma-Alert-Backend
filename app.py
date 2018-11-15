@@ -1,7 +1,7 @@
-from flask import Flask
+from flask import Flask, session
 from flask_restful import Api
 from flask_cors import CORS
-from src.Resource.Display import cis, duty, headlines, intervention, weather, hospitals
+from src.Resource.Display import cis, duty, headlines, intervention, weather, hospitals, calendar
 from src.common.config import Config
 
 config = Config()
@@ -10,7 +10,6 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = config.config['database']['localhost']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.config['database']['track_modification']
-
 
 # Initialize DB
 from src.common.db import db
@@ -26,9 +25,8 @@ api.add_resource(headlines.Headlines, '/display/headlines')
 api.add_resource(hospitals.Hospitals, '/display/hospitals')
 api.add_resource(weather.Weather, '/display/cis/<string:location>/weather')
 api.add_resource(weather.Forecast, '/display/cis/<string:location>/weather/forecast')
-
+api.add_resource(calendar.Calendar, '/display/cis/<string:location>/calendar')
 
 if __name__ == '__main__':
-
     app.run(debug=True)
 
