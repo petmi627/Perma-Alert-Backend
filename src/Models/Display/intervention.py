@@ -1,4 +1,5 @@
 from src.common.db import db
+from datetime import datetime, timedelta
 
 class InterventionModel(db.Model):
 
@@ -60,7 +61,7 @@ class InterventionModel(db.Model):
         return {
             'id': self.id,
             'intervention': self.intervention,
-            'type': self.type,
+            'type': self.type.strip(),
             'beginning': self.beginning.isoformat(),
             'engine': self.engine.split(','),
             'message': self.message,
@@ -87,8 +88,10 @@ class InterventionModel(db.Model):
             'created': self.created.isoformat(),
         }
 
-    def get_alarm(self):
-        # SELECT * FROM `intervention`
-        # WHERE `created` BETWEEN DATE_SUB(NOW() , INTERVAL 20 MINUTE) AND NOW()
-        # ORDER BY `intervention` DESC LIMIT 1
+    @classmethod
+    def get_alarm(cls):
         """ This should return the current intervention """
+        now = datetime.now()
+        past = now - timedelta(minutes=15)
+
+        return cls.query.filter(cls.created.between(past, now)).first()
