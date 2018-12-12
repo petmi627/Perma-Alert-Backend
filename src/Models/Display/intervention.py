@@ -83,10 +83,21 @@ class InterventionModel(db.Model):
                 'info': self.arrival_info,
                 'gps': self.arrival_gps
             },
-            'alarmed_resources': self.alarmed_resources.split(','),
+            'alarmed_resources': self.sort_alarmed_resources(self.alarmed_resources.split(',')),
             'body': self.body,
             'created': self.created.isoformat(),
         }
+
+    def sort_alarmed_resources(self, resources):
+        list = []
+        for resource in resources:
+            engine = resource.strip().split('(')
+            status = resource[resource.find("(")+1:resource.find(")")]
+            list.append({'engine': engine[0].strip(), 'status': int(status)})
+
+        return list
+
+
 
     @classmethod
     def get_alarm(cls):
