@@ -11,12 +11,9 @@ class MemberModel(db.Model):
     lastname = db.Column(db.String)
 
     def json(self):
-
-        lastName = self.lastname.split(' ')[0]
-
         return {'id': self.id,
                 'firstName': self.firstname,
-                'lastName': lastName[0].upper() + lastName[1:].lower(),
+                'lastName': self.lastname,
         }
 
 class ServiceMemberModel(db.Model):
