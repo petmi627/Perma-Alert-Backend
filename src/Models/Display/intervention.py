@@ -1,5 +1,7 @@
+from .cis import *
 from src.common.db import db
 from datetime import datetime, timedelta
+
 
 class InterventionModel(db.Model):
 
@@ -15,24 +17,19 @@ class InterventionModel(db.Model):
     caller = db.Column(db.String)
     ag = db.Column(db.Boolean)
     cis = db.Column(db.String)
-    destination_object = db.Column(db.String)
-    destination_address = db.Column(db.String)
-    destination_region = db.Column(db.String)
+    vehicles = db.relationship('InterventionEngineModel', backref='intervention_info')
+    destination = db.Column(db.Integer, db.ForeignKey('intervention_address_destination.id'))
+    destination_complete = db.relationship('InterventionDestinationModel', back_populates="intervention")
     destination_info = db.Column(db.String)
-    destination_gps = db.Column(db.String)
-    arrival_object = db.Column(db.String)
-    arrival_address = db.Column(db.String)
-    arrival_region = db.Column(db.String)
+    arrival = db.Column(db.Integer, db.ForeignKey('intervention_address_arrival.id'))
+    arrival_complete = db.relationship('InterventionArrivalModel', back_populates="intervention")
     arrival_info = db.Column(db.String)
-    arrival_gps = db.Column(db.String)
     alarmed_resources = db.Column(db.String)
     body = db.Column(db.String)
     created = db.Column(db.DateTime)
 
     def __init__(self, id , intervention, type, beginning, engione, message, description, caller, ag, cis,
-                 destination_object, destination_address, destination_region, destination_info, destination_gps,
-                 arrival_object, arrival_address, arrival_region, arrival_info, arrival_gps,
-                 alarmed_resources, body, created):
+                 destination_info, arrival_info, alarmed_resources, body, created):
         self.id = id
         self.intervention = intervention
         self.type = type
@@ -43,16 +40,8 @@ class InterventionModel(db.Model):
         self.caller = caller
         self.ag = ag
         self.cis = cis
-        self.destination_object = destination_object
-        self.destination_address = destination_address
-        self.destination_region = destination_region
         self.destination_info = destination_info
-        self.destination_gps = destination_gps
-        self.arrival_object = arrival_object
-        self.arrival_address = arrival_address
-        self.arrival_region = arrival_region
         self.arrival_info = arrival_info
-        self.arrival_gps = arrival_gps
         self.alarmed_resources = alarmed_resources
         self.body = body
         self.created = created
@@ -63,46 +52,118 @@ class InterventionModel(db.Model):
             'intervention': self.intervention,
             'type': self.type.strip(),
             'beginning': self.beginning.isoformat(),
-            'engine': self.engine.split(','),
+            'engine': list(map(lambda x: x.json(), self.vehicles)),
             'message': self.message,
             'description': self.description,
             'caller': self.caller,
             'ag': self.ag,
             'cis': self.cis,
-            'destination': {
-                'object': self.destination_object,
-                'address': self.destination_address,
-                'region': self.destination_region,
-                'info': self.destination_info,
-                'gps': self.destination_gps
-            },
-            'arrival': {
-                'object': self.arrival_object,
-                'address': self.arrival_address,
-                'region': self.arrival_region,
-                'info': self.arrival_info,
-                'gps': self.arrival_gps
-            },
+            'destination': self.check_address(self.destination_complete.json()),
+            'destination_info': self.destination_info,
+            'destination_map': self.get_map(self.destination_complete),
+            'arrival': self.check_address(self.arrival_complete),
+            'arrival_info': self.arrival_info,
+            'arrival_map': self.get_map(self.arrival_complete),
             'alarmed_resources': self.sort_alarmed_resources(self.alarmed_resources.split(',')),
             'body': self.body,
             'created': self.created.isoformat(),
         }
+
+    def check_address(self, address):
+        if address == None:
+            return None
+
+        return address
 
     def sort_alarmed_resources(self, resources):
         list = []
         for resource in resources:
             engine = resource.strip().split('(')
             status = resource[resource.find("(")+1:resource.find(")")]
-            list.append({'engine': engine[0].strip(), 'status': int(status)})
+            list.append({'engine': engine[0].strip(), 'status': status})
 
         return list
 
+    def get_map(self, destination):
+        if not destination:
+            return None
 
+        base = 'https://www.google.com/maps/embed/v1/place?key=' + self.api_key
+        if destination.postal or destination.street:
+            url = base + "&q=" + destination.street + ", " + str(destination.postal) + " " + str(destination.city)
+        elif destination.street:
+            url = base + "&q=" + destination.street + ", " + str(destination.city)
+        else:
+            url = base + "&q=" + str(destination.city)
+
+        return url
 
     @classmethod
-    def get_alarm(cls):
+    def get_alarm(cls, cis, api_key):
         """ This should return the current intervention """
+        cls.api_key = api_key
         now = datetime.now()
         past = now - timedelta(minutes=15)
 
-        return cls.query.filter(cls.created.between(past, now)).first()
+        return cls.query.filter(cls.created.between(past, now)).filter_by(cis=cis).first()
+
+
+class InterventionEngineModel(db.Model):
+    __tablename__ = 'intervention_engine'
+
+    id = db.Column(db.Integer, primary_key=True)
+    intervention = db.Column(db.Integer, db.ForeignKey('intervention.id'))
+    engine = db.Column(db.Integer, db.ForeignKey('cis_vehicle.id'))
+
+    def json(self):
+        return self.vehicle.json()
+
+
+class InterventionArrivalModel(db.Model):
+    __tablename__ = 'intervention_address_arrival'
+
+    id = db.Column(db.Integer, primary_key=True)
+    intervention = db.relationship("InterventionModel", back_populates="arrival_complete")
+    object = db.Column(db.String)
+    street = db.Column(db.String)
+    postal = db.Column(db.Integer)
+    city = db.Column(db.String)
+    region = db.Column(db.String)
+    longitude = db.Column(db.String)
+    latitude = db.Column(db.String)
+
+    def json(self):
+        return {'id': self.id,
+                'object': self.object,
+                'street': self.street,
+                'postal': self.postal,
+                'city': self.city,
+                'region': self.region,
+                'longitude': self.longitude,
+                'latitude': self.latitude
+                }
+
+
+class InterventionDestinationModel(db.Model):
+    __tablename__ = 'intervention_address_destination'
+
+    id = db.Column(db.Integer, primary_key=True)
+    intervention = db.relationship("InterventionModel", back_populates="destination_complete")
+    object = db.Column(db.String)
+    street = db.Column(db.String)
+    postal = db.Column(db.Integer)
+    city = db.Column(db.String)
+    region = db.Column(db.String)
+    longitude = db.Column(db.String)
+    latitude = db.Column(db.String)
+
+    def json(self):
+        return {'id': self.id,
+                'object': self.object,
+                'street': self.street,
+                'postal': self.postal,
+                'city': self.city,
+                'region': self.region,
+                'longitude': self.longitude,
+                'latitude': self.latitude
+                }
