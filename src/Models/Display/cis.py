@@ -1,3 +1,4 @@
+from .intervention import *
 from src.common.db import db
 
 class CisVehicleModel(db.Model):
@@ -5,6 +6,7 @@ class CisVehicleModel(db.Model):
     __tablename__ = 'cis_vehicle'
 
     id = db.Column(db.Integer, primary_key=True)
+    vehicle = db.relationship('InterventionEngineModel', backref="vehicle")
     duty = db.Column(db.Integer, db.ForeignKey('cis_engines.id'))
     name = db.Column(db.String)
 
@@ -24,7 +26,6 @@ class CisEngineModel(db.Model):
     name = db.Column(db.String)
     category = db.Column(db.String)
     duty = db.Column(db.String)
-    members = db.Column(db.Integer)
     vehicle = db.relationship('CisVehicleModel')
 
     def json(self):
