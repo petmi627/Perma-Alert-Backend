@@ -6,6 +6,7 @@ class CisVehicleModel(db.Model):
     __tablename__ = 'cis_vehicle'
 
     id = db.Column(db.Integer, primary_key=True)
+    cis = db.Column(db.Integer)
     vehicle = db.relationship('InterventionEngineModel', backref="vehicle")
     duty = db.Column(db.Integer, db.ForeignKey('cis_engines.id'))
     name = db.Column(db.String)
@@ -15,6 +16,11 @@ class CisVehicleModel(db.Model):
             'id': self.id,
             'name': self.name,
         }
+
+    @classmethod
+    def get_vehicle_by_name_and_cis(cls, cis, name):
+        """ Get CIS from database """
+        return cls.query.filter_by(cis=cis, name=name).first()
 
 
 class CisEngineModel(db.Model):
