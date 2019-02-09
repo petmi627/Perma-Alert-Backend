@@ -32,6 +32,7 @@ class CisEngineModel(db.Model):
     name = db.Column(db.String)
     category = db.Column(db.String)
     duty = db.Column(db.String)
+    members = db.Column(db.Integer)
     vehicle = db.relationship('CisVehicleModel')
 
     def json(self):

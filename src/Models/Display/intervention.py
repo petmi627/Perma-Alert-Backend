@@ -111,52 +111,62 @@ class InterventionModel(db.Model):
     @classmethod
     def get_stats_by_vehicle(cls, cis, vehicle):
         now = datetime.now()
+
         # Get Last Intervention
-        last_intervention = cls.query.filter_by(cis=cis.id).order_by(cls.id.desc()).first()
+        last_intervention = cls.query.join(cls.vehicles).filter(
+            InterventionEngineModel.engine == vehicle.id, cls.cis == cis.id
+        ).order_by(cls.id.desc()).first()
 
         # Get Intervention Today
         start = now.strftime('%Y-%m-%d') + " 00:00:00"
         end = now.strftime('%Y-%m-%d') + " 23:59:59"
-        interventions_today = cls.query.filter(cls.created.between(start, end)).filter_by(cis=cis.id).count()
+        interventions_today = cls.query.join(cls.vehicles).filter(
+            InterventionEngineModel.engine == vehicle.id, cls.created.between(start, end), cls.cis == cis.id).count()
 
         yesterday = now - timedelta(days=1)
         start = yesterday.strftime('%Y-%m-%d') + " 00:00:00"
         end = yesterday.strftime('%Y-%m-%d') + " 23:59:59"
-        interventions_yesterday = cls.query.filter(cls.created.between(start, end)).filter_by(cis=cis.id).order_by(
+        interventions_yesterday = cls.query.join(cls.vehicles).filter(
+            InterventionEngineModel.engine == vehicle.id, cls.created.between(start, end), cls.cis == cis.id).order_by(
             cls.id.desc()).count()
 
         start = now - timedelta(days=now.weekday())
         end = start + timedelta(days=6)
         start = start.strftime('%Y-%m-%d') + " 00:00:00"
         end = end.strftime('%Y-%m-%d') + " 23:59:59"
-        interventions_this_week = cls.query.filter(cls.created.between(start, end)).filter_by(cis=cis.id).order_by(
+        interventions_this_week = cls.query.join(cls.vehicles).filter(
+            InterventionEngineModel.engine == vehicle.id, cls.created.between(start, end), cls.cis == cis.id).order_by(
             cls.id.desc()).count()
 
         start = now - timedelta(days=now.weekday(), weeks=1)
         end = start + timedelta(days=6)
         start = start.strftime('%Y-%m-%d') + " 00:00:00"
         end = end.strftime('%Y-%m-%d') + " 23:59:59"
-        interventions_last_week = cls.query.filter(cls.created.between(start, end)).filter_by(cis=cis.id).order_by(
+        interventions_last_week = cls.query.join(cls.vehicles).filter(
+            InterventionEngineModel.engine == vehicle.id, cls.created.between(start, end), cls.cis == cis.id).order_by(
             cls.id.desc()).count()
 
         start = now.strftime('%Y-%m-') + "01 00:00:00"
         end = now.replace(day=calendar.monthrange(now.year, now.month)[1])
         end = end.strftime('%Y-%m-%d') + " 23:59:59"
-        interventions_this_month = cls.query.filter(cls.created.between(start, end)).filter_by(cis=cis.id).order_by(
+        interventions_this_month = cls.query.join(cls.vehicles).filter(
+            InterventionEngineModel.engine == vehicle.id, cls.created.between(start, end), cls.cis == cis.id).order_by(
             cls.id.desc()).count()
 
         start = now.replace(day=1)
         start_dt = start - timedelta(days=1)
         start = start_dt.strftime('%Y-%m-') + "01 00:00:00"
         end = start_dt.strftime('%Y-%m-%d') + " 23:59:59"
-        interventions_last_month = cls.query.filter(cls.created.between(start, end)).filter_by(cis=cis.id).order_by(
+        interventions_last_month = cls.query.join(cls.vehicles).filter(
+            InterventionEngineModel.engine == vehicle.id, cls.created.between(start, end), cls.cis == cis.id).order_by(
             cls.id.desc()).count()
 
         start = now.replace(day=1, month=1)
         start = start.strftime('%Y-%m-%d') + " 00:00:00"
         end = now.replace(day=31, month=12)
         end = end.strftime('%Y-%m-%d') + " 23:59:59"
-        interventions_this_year = cls.query.filter(cls.created.between(start, end)).filter_by(cis=cis.id).order_by(
+        interventions_this_year = cls.query.join(cls.vehicles).filter(
+            InterventionEngineModel.engine == vehicle.id, cls.created.between(start, end), cls.cis == cis.id).order_by(
             cls.id.desc()).count()
 
         return {
