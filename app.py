@@ -1,7 +1,7 @@
 from flask import Flask, session
 from flask_restful import Api
 from flask_cors import CORS
-from src.Resource.Display import cis, duty, headlines, intervention, weather, hospitals, calendar, water_levels, crisis
+from src.Resource.Display import cis, duty, headlines, intervention, weather, hospitals, calendar, water_levels, crisis, instagram
 from src.common.config import Config
 
 config = Config()
@@ -29,6 +29,7 @@ api.add_resource(weather.Weather, '/display/cis/<string:location>/weather')
 api.add_resource(weather.Forecast, '/display/cis/<string:location>/weather/forecast')
 api.add_resource(water_levels.WaterLevels, '/display/cis/<string:location>/water_level')
 api.add_resource(calendar.Calendar, '/display/cis/<string:location>/calendar')
+api.add_resource(instagram.Instagram, '/display/cis/<string:location>/instagram')
 
 if __name__ == '__main__':
     app.run(debug=True)

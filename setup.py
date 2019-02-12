@@ -15,6 +15,11 @@ secret_keys = {
   "google_api": "",
   "google_maps_key": "",
 
+  "instagram_api_user": {
+    "username": "",
+    "password": ""
+  },
+
   "calendarId": ""
 }
 with open(os.path.join(base, 'config/secrets/secret_keys.json'), 'w') as outfile:
