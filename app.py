@@ -32,5 +32,5 @@ api.add_resource(calendar.Calendar, '/display/cis/<string:location>/calendar')
 api.add_resource(instagram.Instagram, '/display/cis/<string:location>/instagram')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
 
