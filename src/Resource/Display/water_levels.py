@@ -11,7 +11,7 @@ class WaterLevels(Resource):
         if not cis:
             abort(404, message="CIS {} doesn't exist".format(location))
 
-        request = requests.get('https://heichwaasser.lu/api/v1/stations/63')
+        request = requests.get('https://heichwaasser.lu/api/v1/stations/63') # TODO: Get URL from Config
         if not request.status_code == 200:
             abort(404, message="Cannot get water level data for city {}".format(location))
 

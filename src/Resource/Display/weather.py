@@ -35,7 +35,7 @@ class Weather(Resource):
 
         c = Config()
 
-        request = requests.get('https://api.openweathermap.org/data/2.5/weather?&units=metric&q=' +
+        request = requests.get('https://api.openweathermap.org/data/2.5/weather?&units=metric&q=' + # TODO: Get URL from Config
                                cis.location + ',LU&appid=' + c.config['secret_keys']['weather_api'])
         if not request.status_code == 200:
             abort(404, message="Cannot get weather data for city {}".format(location))

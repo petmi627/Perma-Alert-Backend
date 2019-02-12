@@ -5,7 +5,7 @@ import requests, re
 class Headlines(Resource):
     def get(self):
 
-        r = requests.get("http://www.rtl.lu/rss/national")
+        r = requests.get("http://www.rtl.lu/rss/national") # TODO: Get URL from Config
         if not r.status_code == 200:
             abort(404, message="Cannot get hospital data")
 

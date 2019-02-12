@@ -7,7 +7,7 @@ from src.Models.Display.hospital import HospitalModel
 class Hospitals(Resource):
     def get(self):
 
-       r = requests.get("http://www.rtl.lu/service/services-de-garde/klinicken")
+       r = requests.get("http://www.rtl.lu/service/services-de-garde/klinicken") # TODO: Get URL from Config
        if not r.status_code == 200:
            abort(404, message="Cannot get hospital data")
 

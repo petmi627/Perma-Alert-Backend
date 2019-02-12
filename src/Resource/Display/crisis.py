@@ -5,7 +5,7 @@ import requests, re
 class Crisis(Resource):
     def get(self):
 
-        r = requests.get("https://www.infocrise.lu/de")
+        r = requests.get("https://www.infocrise.lu/de") # TODO: Get URL from Config
         if not r.status_code == 200:
             abort(404, message="Cannot get crisis data")
 
