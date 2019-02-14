@@ -17,28 +17,21 @@ class Instagram(Resource):
         ig.login()
 
         hashTagList = ['cisdik'] # TODO: Need to get info from database
-        personalFeed = []
+
+        feed = None
 
         for hastag in hashTagList:
             ig.getHashtagFeed(hastag)
-            personalFeed.append(self.parse_json(ig.LastJson))
+            feed = self.parse_json(ig.LastJson)
 
         userFeedList = ['6009368630'] #cgdislux
-        mainFeed = []
         for user in userFeedList:
             ig.getUserFeed(user)
-            mainFeed.append(self.parse_json(ig.LastJson))
+            feed = self.parse_json(ig.LastJson, feed)
 
-        d = {
-            'personal': personalFeed,
-            'main': mainFeed
-        }
+        return feed, 200
 
-        return d, 200
-
-    def parse_json(self, feed):
-        list = []
-
+    def parse_json(self, feed, list=[]):
         for post in feed['items']:
                 d = {
                     'id': post['id'],
