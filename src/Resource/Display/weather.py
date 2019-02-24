@@ -54,6 +54,8 @@ class Weather(Resource):
             'wind_speed': weather['wind']['speed'],
             'location': str(weather['name']),
             'country': str(weather['sys']['country']),
+            'sunrise': datetime.utcfromtimestamp(weather['sys']['sunrise']).strftime('%Y-%m-%d %H:%M:%S'),
+            'sunset': datetime.utcfromtimestamp(weather['sys']['sunset']).strftime('%Y-%m-%d %H:%M:%S'),
         }, 200
 
 class Forecast(Resource):
