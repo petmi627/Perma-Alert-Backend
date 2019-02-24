@@ -22,6 +22,11 @@ class CisVehicleModel(db.Model):
         """ Get CIS from database """
         return cls.query.filter_by(cis=cis, name=name).first()
 
+    @classmethod
+    def get_vehicle_by_engine(cls, engine):
+        """ Get CIS from database """
+        return cls.query.filter_by(duty=engine).first()
+
 
 class CisEngineModel(db.Model):
 

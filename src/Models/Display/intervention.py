@@ -59,7 +59,7 @@ class InterventionModel(db.Model):
             'caller': self.caller,
             'ag': self.ag,
             'cis': self.cis,
-            'destination': self.check_address(self.destination_complete.json()),
+            'destination': self.check_address(self.destination_complete),
             'destination_info': self.destination_info,
             'destination_map': self.get_map(self.destination_complete),
             'arrival': self.check_address(self.arrival_complete),
@@ -71,10 +71,10 @@ class InterventionModel(db.Model):
         }
 
     def check_address(self, address):
-        if address == None:
+        if not address:
             return None
 
-        return address
+        return address.json()
 
     def sort_alarmed_resources(self, resources):
         list = []
@@ -170,6 +170,7 @@ class InterventionModel(db.Model):
             cls.id.desc()).count()
 
         return {
+               'vehicle': vehicle.name,
                'last_intervention': str(last_intervention.beginning),
                'stats_timeline': {
                    'interventions_today': int(interventions_today),

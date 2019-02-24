@@ -1,6 +1,6 @@
 from flask_restful import Resource, abort
 from src.common.config import Config
-from src.Models.Display.cis import CisModel, CisVehicleModel
+from src.Models.Display.cis import CisModel, CisVehicleModel, CisEngineModel
 from src.Models.Display.intervention import InterventionModel
 
 class Intervention(Resource):
@@ -16,12 +16,16 @@ class Intervention(Resource):
         return alarm.json(), 200
 
 class InterventionStats(Resource):
-    def get(self, location, vehicle):
+    def get(self, location, engine):
         cis = CisModel.get_cis_by_location(location=location)
         if not cis:
             abort(404, message="CIS {} doesn't exist".format(location))
 
-        vehicle = CisVehicleModel.get_vehicle_by_name_and_cis(cis.id, vehicle)
+        engine = CisEngineModel.get_engine_by_name_and_cis(cis.id, engine)
+        if not engine:
+            abort(404, message="Engine {} for CIS {} doesn't exist".format(engine, location))
+
+        vehicle = CisVehicleModel.get_vehicle_by_engine(engine.id)
         if not vehicle:
             abort(404, message="Vehicle {} for CIS {} doesn't exist".format(vehicle, location))
 
