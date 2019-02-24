@@ -3,8 +3,10 @@ from flask_restful import Resource, abort
 from src.common.config import Config
 from src.Models.Display.cis import CisModel
 import datetime
+from flask_jwt_extended import jwt_required
 
 class Instagram(Resource):
+    @jwt_required
     def get(self, location):
         cis = CisModel.get_cis_by_location(location=location)
         if not cis:

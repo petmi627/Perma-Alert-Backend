@@ -1,13 +1,14 @@
 from flask_restful import Resource, abort
 from src.Models.Display.cis import CisModel
 from src.common.config import Config
+from flask_jwt_extended import jwt_required
 
 import datetime
 from googleapiclient.discovery import build
 
 class Calendar(Resource):
 
-
+    @jwt_required
     def get(self, location):
         """ Return a List with cis """
         cis = CisModel.get_cis_by_location(location=location)

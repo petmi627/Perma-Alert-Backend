@@ -1,8 +1,10 @@
 from flask_restful import Resource, abort
 from src.Models.Display.duty import DutyModel
 from src.Models.Display.cis import CisModel, CisEngineModel
+from flask_jwt_extended import jwt_required
 
 class Duty(Resource):
+    @jwt_required
     def get(self, location, engine):
         """ Return a Duty List from specified engine """
         cis = CisModel.get_cis_by_location(location=location)

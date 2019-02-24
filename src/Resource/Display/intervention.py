@@ -2,8 +2,10 @@ from flask_restful import Resource, abort
 from src.common.config import Config
 from src.Models.Display.cis import CisModel, CisVehicleModel, CisEngineModel
 from src.Models.Display.intervention import InterventionModel
+from flask_jwt_extended import jwt_required
 
 class Intervention(Resource):
+    @jwt_required
     def get(self, location):
         c = Config()
         cis = CisModel.get_cis_by_location(location=location)
@@ -16,6 +18,7 @@ class Intervention(Resource):
         return alarm.json(), 200
 
 class InterventionStats(Resource):
+    @jwt_required
     def get(self, location, engine):
         cis = CisModel.get_cis_by_location(location=location)
         if not cis:

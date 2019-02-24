@@ -3,6 +3,7 @@ import requests
 from datetime import datetime, timedelta
 from src.Models.Display.cis import CisModel
 from src.common.config import Config
+from flask_jwt_extended import jwt_required
 
 
 class Weather(Resource):
@@ -27,6 +28,7 @@ class Weather(Resource):
 
         return icon.format(icon_format)
 
+    @jwt_required
     def get(self, location):
         """ Return a List with cis """
         cis = CisModel.get_cis_by_location(location=location)
@@ -69,6 +71,7 @@ class Forecast(Resource):
 
         return icon.format(icon_format)
 
+    @jwt_required
     def get(self, location):
         """ Return the Weather Forecast of the given location """
         cis = CisModel.get_cis_by_location(location=location)

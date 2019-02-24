@@ -1,9 +1,10 @@
 import tweepy
 from flask_restful import Resource, abort
 from src.common.config import Config
-from src.Models.Display.cis import CisModel
+from flask_jwt_extended import jwt_required
 
 class Twitter(Resource):
+    @jwt_required
     def get(self, location):
 
         c = Config()

@@ -1,7 +1,7 @@
 from flask_restful import Resource, abort, reqparse
 from src.Models.Display.user import UserModel
 from werkzeug.security import safe_str_cmp
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required
 import uuid, bcrypt, hashlib, base64
 
 _user_parser = reqparse.RequestParser()
@@ -29,6 +29,7 @@ def checkpw(password, hash):
     return password
 
 class UserRegister(Resource):
+    @jwt_required
     def post(self):
         data = _user_parser.parse_args()
 
