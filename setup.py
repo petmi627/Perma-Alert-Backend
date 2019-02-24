@@ -11,6 +11,8 @@ create_folders(os.path.join(base, 'config/secrets'))
 
 print("Generating secret keys config file")
 secret_keys = {
+  "SECRET_KEY": "",
+
   "weather_api": "",
   "google_api": "",
   "google_maps_key": "",
@@ -18,6 +20,13 @@ secret_keys = {
   "instagram_api_user": {
     "username": "",
     "password": ""
+  },
+
+  "twitter_api_access": {
+    "consumer_key": "",
+    "consumer_secret": "",
+    "access_key": "",
+    "access_secret": ""
   },
 
   "calendarId": ""
