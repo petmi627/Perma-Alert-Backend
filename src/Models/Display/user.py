@@ -1,4 +1,5 @@
 from src.common.db import db
+from .cis import *
 
 class UserModel(db.Model):
 
@@ -7,6 +8,7 @@ class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String)
     password = db.Column(db.String)
+    cis = db.Column(db.Integer, db.ForeignKey('cis.id'))
     created = db.Column(db.TIMESTAMP)
     modified = db.Column(db.TIMESTAMP)
 
@@ -18,6 +20,7 @@ class UserModel(db.Model):
         """ Return a directory from Model """
         return {
             'username': self.username,
+            'cis': self.registered.json()
         }
 
     def save_to_db(self):
@@ -28,3 +31,8 @@ class UserModel(db.Model):
     def get_user_by_username(cls, username):
         """ Get CIS from database """
         return cls.query.filter_by(username=username).first()
+
+    @classmethod
+    def get_user_by_id(cls, id):
+        """ Get CIS from database """
+        return cls.query.filter_by(id=id).first()

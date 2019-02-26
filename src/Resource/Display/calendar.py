@@ -1,7 +1,7 @@
 from flask_restful import Resource, abort
 from src.Models.Display.cis import CisModel
 from src.common.config import Config
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_claims
 
 import datetime
 from googleapiclient.discovery import build
@@ -14,6 +14,10 @@ class Calendar(Resource):
         cis = CisModel.get_cis_by_location(location=location)
         if not cis:
             abort(404, message="CIS {} doesn't exist".format(location))
+
+        claims = get_jwt_claims()
+        if not cis.id == claims['cis']['id']:
+            abort(403, message="User {} has no access to display.".format(claims['username']))
 
         c = Config()
         service = build('calendar', 'v3', developerKey=c.config['secret_keys']['google_api'])

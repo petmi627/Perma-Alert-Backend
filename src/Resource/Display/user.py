@@ -1,7 +1,13 @@
 from flask_restful import Resource, abort, reqparse
 from src.Models.Display.user import UserModel
 from werkzeug.security import safe_str_cmp
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    jwt_refresh_token_required,
+    get_jwt_identity,
+)
 import uuid, bcrypt, hashlib, base64
 
 _user_parser = reqparse.RequestParser()
@@ -41,6 +47,15 @@ class UserRegister(Resource):
 
         return {"message": "User created successfully."}, 201
 
+class User(Resource):
+    @jwt_required
+    def get(self, username):
+        user = UserModel.get_user_by_username(username)
+        if user:
+            return user.json(), 200
+        abort(404, message="User {} doesn't exist".format(username))
+
+
 class UserLogin(Resource):
     @classmethod
     def post(cls):
@@ -57,6 +72,14 @@ class UserLogin(Resource):
             }, 200
 
         abort(401, message='Invalid credentials')
+
+class TokenRefresh(Resource):
+    @jwt_refresh_token_required
+    def post(self):
+        current_user = get_jwt_identity()
+        new_token = create_access_token(identity=current_user, fresh=False)
+
+        return {'access_token': new_token}, 200
 
 
 

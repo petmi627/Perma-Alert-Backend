@@ -1,4 +1,5 @@
 from .intervention import *
+from .user import *
 from src.common.db import db
 
 class CisVehicleModel(db.Model):
@@ -63,6 +64,7 @@ class CisModel(db.Model):
     name = db.Column(db.String)
     location = db.Column(db.String)
     engines = db.relationship('CisEngineModel')
+    vehicle = db.relationship('UserModel', backref="registered")
 
     def __init__(self, id, name, location):
         self.id = id
