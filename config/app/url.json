@@ -1,0 +1,10 @@
+{
+  "crisis": "https://www.infocrise.lu/de",
+  "headlines": "http://www.rtl.lu/rss/national",
+  "hospitals": "http://www.rtl.lu/service/services-de-garde/klinicken",
+  "water_levels": "https://heichwaasser.lu/api/v1/stations/",
+  "weather": {
+    "current": "https://api.openweathermap.org/data/2.5/weather?&units=metric&q=",
+    "forecast": "https://api.openweathermap.org/data/2.5/forecast?&units=metric&q="
+  }
+}

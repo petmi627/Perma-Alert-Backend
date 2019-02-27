@@ -1,11 +1,12 @@
 from flask_restful import Resource, abort
 from bs4 import BeautifulSoup
 import requests, re
+from src.common.config import Config
 
 class Headlines(Resource):
     def get(self):
-
-        r = requests.get("http://www.rtl.lu/rss/national") # TODO: Get URL from Config
+        c = Config()
+        r = requests.get(c.config['url']['headlines'])
         if not r.status_code == 200:
             abort(404, message="Cannot get hospital data")
 

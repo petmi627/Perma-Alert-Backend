@@ -1,7 +1,8 @@
 from flask_restful import Resource, abort
 from src.Models.Display.cis import CisModel
+from src.common.config import Config
 
-import requests
+import requests, json
 
 
 class WaterLevels(Resource):
@@ -11,7 +12,11 @@ class WaterLevels(Resource):
         if not cis:
             abort(404, message="CIS {} doesn't exist".format(location))
 
-        request = requests.get('https://heichwaasser.lu/api/v1/stations/63') # TODO: Get URL from Config
+        settings = json.loads(cis.settings)
+
+        c = Config()
+
+        request = requests.get(c.config['url']['water_levels'] + settings['water_station'])
         if not request.status_code == 200:
             abort(404, message="Cannot get water level data for city {}".format(location))
 

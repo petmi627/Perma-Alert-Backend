@@ -1,4 +1,4 @@
-import tweepy
+import tweepy, json
 from flask_restful import Resource, abort
 from src.common.config import Config
 from src.Models.Display.cis import CisModel
@@ -12,6 +12,8 @@ class Twitter(Resource):
         if not cis:
             abort(404, message="CIS {} doesn't exist".format(location))
 
+        settings = json.loads(cis.settings)
+
         claims = get_jwt_claims()
         if not cis.id == claims['cis']['id']:
             abort(403, message="User {} has no access to display.".format(claims['username']))
@@ -23,12 +25,9 @@ class Twitter(Resource):
         auth.set_access_token(c.config['secret_keys']['twitter_api_access']['access_key'],
                               c.config['secret_keys']['twitter_api_access']['access_secret'])
         api = tweepy.API(auth)
-
-        #CGDISlux : 894542671129305088
         tweets_list = []
-        user_list = ['894542671129305088']
 
-        for user in user_list:
+        for user in settings['twitter']['feeds']:
             feed = tweepy.Cursor(api.user_timeline, id=user).items(7)
             for status in feed:
                 tweets_list.append(self.parse_status(api.get_status(status._json['id'], tweet_mode='extended')._json))

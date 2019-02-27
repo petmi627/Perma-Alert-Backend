@@ -3,6 +3,7 @@ from src.common.config import Config
 from src.Models.Display.cis import CisModel, CisVehicleModel, CisEngineModel
 from src.Models.Display.intervention import InterventionModel
 from flask_jwt_extended import jwt_required, get_jwt_claims
+import json
 
 class Intervention(Resource):
     @jwt_required

@@ -3,7 +3,7 @@ from src.Models.Display.cis import CisModel
 from src.common.config import Config
 from flask_jwt_extended import jwt_required, get_jwt_claims
 
-import datetime
+import datetime, json
 from googleapiclient.discovery import build
 
 class Calendar(Resource):
@@ -15,6 +15,8 @@ class Calendar(Resource):
         if not cis:
             abort(404, message="CIS {} doesn't exist".format(location))
 
+        settings = json.loads(cis.settings)
+
         claims = get_jwt_claims()
         if not cis.id == claims['cis']['id']:
             abort(403, message="User {} has no access to display.".format(claims['username']))
@@ -24,7 +26,7 @@ class Calendar(Resource):
 
         # Call the Calendar API
         now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-        events_result = service.events().list(calendarId=c.config['secret_keys']['calendarId'],# Later this info come from the DB
+        events_result = service.events().list(calendarId=settings['calendar'],
                                               timeMin=now,
                                               maxResults=12,
                                               singleEvents=True,

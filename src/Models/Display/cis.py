@@ -63,6 +63,8 @@ class CisModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     location = db.Column(db.String)
+    layout = db.Column(db.String)
+    settings = db.Column(db.String)
     engines = db.relationship('CisEngineModel')
     vehicle = db.relationship('UserModel', backref="registered")
 
@@ -77,6 +79,7 @@ class CisModel(db.Model):
             'id': self.id,
             'name': self.name,
             'location': self.location,
+            'layout': self.layout,
             'engines': list(map(lambda x: x.json(), self.engines))
         }
 

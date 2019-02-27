@@ -1,5 +1,5 @@
 from flask_restful import Resource, abort
-import requests
+import requests, json
 from datetime import datetime, timedelta
 from src.Models.Display.cis import CisModel
 from src.common.config import Config
@@ -35,14 +35,16 @@ class Weather(Resource):
         if not cis:
             abort(404, message="CIS {} doesn't exist".format(location))
 
+        settings = json.loads(cis.settings)
+
         claims = get_jwt_claims()
         if not cis.id == claims['cis']['id']:
             abort(403, message="User {} has no access to display.".format(claims['username']))
 
         c = Config()
 
-        request = requests.get('https://api.openweathermap.org/data/2.5/weather?&units=metric&q=' + # TODO: Get URL from Config
-                               cis.location + ',LU&appid=' + c.config['secret_keys']['weather_api'])
+        request = requests.get(c.config['url']['weather']['current'] +
+                               settings['weather_station'] + ',LU&appid=' + c.config['secret_keys']['weather_api'])
         if not request.status_code == 200:
             abort(404, message="Cannot get weather data for city {}".format(location))
 
@@ -82,13 +84,15 @@ class Forecast(Resource):
         if not cis:
             abort(404, message="CIS {} doesn't exist".format(location))
 
+        settings = json.loads(cis.settings)
+
         claims = get_jwt_claims()
         if not cis.id == claims['cis']['id']:
             abort(403, message="User {} has no access to display.".format(claims['username']))
 
         c = Config()
-        request = requests.get('https://api.openweathermap.org/data/2.5/forecast?&units=metric&q=' +
-                               cis.location + ',LU&appid=' + c.config['secret_keys']['weather_api'])
+        request = requests.get(c.config['url']['weather']['forecast'] +
+                               settings['weather_station'] + ',LU&appid=' + c.config['secret_keys']['weather_api'])
         if not request.status_code == 200:
             abort(404, message="Cannot get weather data for city {}".format(location))
 

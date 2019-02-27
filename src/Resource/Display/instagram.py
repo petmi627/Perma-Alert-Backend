@@ -2,7 +2,7 @@ from InstagramAPI import InstagramAPI
 from flask_restful import Resource, abort
 from src.common.config import Config
 from src.Models.Display.cis import CisModel
-import datetime
+import datetime, json
 from flask_jwt_extended import jwt_required, get_jwt_claims
 
 class Instagram(Resource):
@@ -11,6 +11,8 @@ class Instagram(Resource):
         cis = CisModel.get_cis_by_location(location=location)
         if not cis:
             abort(404, message="CIS {} doesn't exist".format(location))
+
+        settings = json.loads(cis.settings)
 
         claims = get_jwt_claims()
         if not cis.id == claims['cis']['id']:
@@ -22,16 +24,12 @@ class Instagram(Resource):
                           c.config['secret_keys']['instagram_api_user']['password'])
         ig.login()
 
-        hashTagList = ['cisdik'] # TODO: Need to get info from database
-
         feed = None
-
-        for hastag in hashTagList:
+        for hastag in settings['instagram']['hashtags']:
             ig.getHashtagFeed(hastag)
             feed = self.parse_json(ig.LastJson)
 
-        userFeedList = ['6009368630'] #cgdislux
-        for user in userFeedList:
+        for user in settings['instagram']['feeds']:
             ig.getUserFeed(user)
             feed = self.parse_json(ig.LastJson, feed)
 

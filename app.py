@@ -90,5 +90,5 @@ api.add_resource(user.UserRegister, '/register')
 api.add_resource(user.User, '/users/<string:username>')
 
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True)
+    app.run(threaded=True)
 
