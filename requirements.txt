@@ -3,7 +3,9 @@ Flask_RESTful>=0.3.6
 requests>=2.18.4
 SQLAlchemy==1.1.15
 Flask_SQLAlchemy==2.3.2
+Flask-JWT-Extended==3.17.0
 beautifulsoup4==4.6.3
 flask_cors==3.0.6
 google-api-python-client==1.7.4
 InstagramAPI==1.0.2
+tweepy==3.7.0
