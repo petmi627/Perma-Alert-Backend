@@ -7,5 +7,6 @@ Flask-JWT-Extended==3.17.0
 beautifulsoup4==4.6.3
 flask_cors==3.0.6
 google-api-python-client==1.7.4
-InstagramAPI==1.0.2
+InstagramAPI>=1.0.2
 tweepy==3.7.0
+bcrypt==3.1.6

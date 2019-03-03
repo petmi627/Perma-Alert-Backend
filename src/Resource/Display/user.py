@@ -1,6 +1,5 @@
 from flask_restful import Resource, abort, reqparse
 from src.Models.Display.user import UserModel
-from werkzeug.security import safe_str_cmp
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -8,7 +7,7 @@ from flask_jwt_extended import (
     jwt_refresh_token_required,
     get_jwt_identity,
 )
-import uuid, bcrypt, hashlib, base64
+import bcrypt, hashlib, base64
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument('username',
@@ -60,7 +59,6 @@ class UserLogin(Resource):
     @classmethod
     def post(cls):
         data = _user_parser.parse_args()
-
         user = UserModel.get_user_by_username(data['username'])
 
         if user and checkpw(data['password'], user.password):
