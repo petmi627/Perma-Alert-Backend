@@ -20,10 +20,9 @@ class Hospitals(Resource):
 
        hospitalList = []
 
-       hospitals = soup.find_all(style=re.compile("background-color: #c6dcc1"))[1:]
+       hospitals = soup.find_all('li', class_='sdg-list__item--active')
        for hospital in hospitals:
-
-           hospital_name = hospital.b.string
+           hospital_name = hospital.find('span', class_='card__title').string
 
            hospitals = hospital.find_all("b")
            if len(hospitals) > 1:
