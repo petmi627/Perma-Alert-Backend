@@ -62,7 +62,7 @@ class UserLogin(Resource):
         user = UserModel.get_user_by_username(data['username'])
 
         if user and checkpw(data['password'], user.password):
-            access_token = create_access_token(identity=user.id, fresh=True)
+            access_token = create_access_token(identity=user.id, fresh=True, expires_delta=False)
             refresh_token = create_refresh_token(user.id)
             return {
                'access_token': access_token,
