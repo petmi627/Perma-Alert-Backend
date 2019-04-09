@@ -18,6 +18,7 @@ from src.Resource.Display import (
     user
 )
 from src.common.config import Config
+import secrets
 
 config = Config()
 
@@ -25,7 +26,7 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = config.config['database']['localhost']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.config['database']['track_modification']
-app.secret_key = config.config['secret_keys']['SECRET_KEY']
+app.secret_key = secrets.token_urlsafe(128)
 
 # Initialize DB
 from src.common.db import db
