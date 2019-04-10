@@ -26,6 +26,7 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = config.config['database']['localhost']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.config['database']['track_modification']
+app.config['JWT_EXPIRATION_DELTA'] = False
 app.secret_key = secrets.token_urlsafe(128)
 
 # Initialize DB
